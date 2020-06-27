@@ -34,8 +34,8 @@ class AuthProvider with ChangeNotifier {
         email: emailID,
         password: password,
       );
-
       if (authResult != null) {
+        print(authResult);
         notifyListeners();
       }
     } catch (err) {
@@ -56,7 +56,13 @@ class AuthProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (err) {
+
+      if(err.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
+        print("call singin");
+        await signIn(emailID: emailID,password: password);
+      } else{
       throw HTTPException(errorMessage: err.toString());
+      }
     }
   }
 }
