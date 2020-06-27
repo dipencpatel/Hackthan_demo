@@ -2,6 +2,8 @@ import 'package:demo/provider/auth_provider.dart';
 import 'package:demo/screens/command_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import './provider/user_provider.dart';
+
 
 ///added this to check all dependancies are downloaded or not
 
@@ -19,6 +21,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (cntx) => AuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (cntx) => UserList(),
         ),
       ],
       child: MaterialApp(
