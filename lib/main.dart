@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+///added this to check all dependancies are downloaded or not
 
 void main() {
   runApp(MyApp());
