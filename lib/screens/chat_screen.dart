@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:demo/provider/Model/chatmodel.dart';
 import 'package:demo/api_manager/constant.dart';
-import 'package:demo/provider/Model/user.dart';
+import 'package:demo/provider/user_provider.dart';
 import 'package:demo/utility/common_methods.dart';
 
 final database = FirebaseDatabase.instance;
@@ -15,13 +15,12 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-
   User userMine = User(
-      user_id: "1YTHlthZVQPxzSFlIN9afG7dUSU2",
-      user_email: "mirant.patel@gmail.com");
+      userId: "1YTHlthZVQPxzSFlIN9afG7dUSU2",
+      userName: "mirant.patel@gmail.com");
   User userOther = User(
-      user_id: "G2iAxPZqlwXi348vUfxcCJ3dQBu1",
-      user_email: "ankit_khatri@gmail.com");
+      userId: "G2iAxPZqlwXi348vUfxcCJ3dQBu1",
+      userName: "ankit_khatri@gmail.com");
 
   final _childSenderQuery = database.reference().child(keyTableMainChild);
   StreamSubscription<Event> _onChatAddedSenderSubscription;
@@ -72,22 +71,22 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Expanded(
                 child: ListView.builder(
-                  itemCount: listChatAllData.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                        precisionChatText(
-                            listChatAllData[index], userMine, userOther),
-                        style: TextStyle(
-                            color: isMyMessage(
+              itemCount: listChatAllData.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(
+                    precisionChatText(
+                        listChatAllData[index], userMine, userOther),
+                    style: TextStyle(
+                        color: isMyMessage(
                                 listChatAllData[index], userMine, userOther)
-                                ? Colors.white
-                                : Colors.lightGreen,
-                            fontSize: 18.0),
-                      ),
-                    );
-                  },
-                )),
+                            ? Colors.white
+                            : Colors.lightGreen,
+                        fontSize: 18.0),
+                  ),
+                );
+              },
+            )),
             Container(
               height: isOpenKeyboard ? 250 : 0,
               width: double.infinity,

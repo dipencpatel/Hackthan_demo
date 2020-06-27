@@ -1,9 +1,9 @@
 import 'package:demo/provider/Model/chatmodel.dart';
-import 'package:demo/provider/Model/user.dart';
+import 'package:demo/provider/user_provider.dart';
 
 String createKeyForChatRoom(List<User> usersArray) {
-  usersArray.sort((a, b) => a.user_email.compareTo(b.user_email));
-  return "${usersArray[0].user_id}_${usersArray[1].user_id}";
+  usersArray.sort((a, b) => a.userName.compareTo(b.userName));
+  return "${usersArray[0].userId}_${usersArray[1].userId}";
 }
 
 String nameFromEmail(String email) {
@@ -11,12 +11,12 @@ String nameFromEmail(String email) {
 }
 
 String precisionChatText(Chat objChat, User usermine, User userother) {
-  return objChat.sender_id == usermine.user_id
+  return objChat.sender_id == usermine.userId
       ? "Me:> ${objChat.message}"
-      : "${nameFromEmail(userother.user_email)}:> ${objChat.message}";
+      : "${nameFromEmail(userother.userName)}:> ${objChat.message}";
 }
 
 bool isMyMessage(Chat objChat, User usermine, User userother) {
-  return objChat.sender_id == usermine.user_id
+  return objChat.sender_id == usermine.userId
       ? true : false;
 }
