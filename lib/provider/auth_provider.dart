@@ -1,41 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import '../api_manager/http_exception.dart';
+import '../api_manager/constant.dart' as CONSTANT;
 
 class AuthProvider with ChangeNotifier {
-  String _token;
-  DateTime _expiryDate;
-  String _userID;
   final _authInstance = FirebaseAuth.instance;
+  AuthResult _authResult;
 
-  bool get isAuthenticated {
-    return token != null;
+  String _getEmailFromUsername(String username) {
+    return '$username@gmail.com';
   }
 
-  String get userID {
-    return _userID;
-  }
-
-  String get token {
-    if (_expiryDate != null &&
-        _expiryDate.isAfter(DateTime.now()) &&
-        _token != null) {
-      return _token;
-    }
-    return null;
-  }
-
-  Future<void> signIn({emailID: String, password: String}) async {
-    AuthResult authResult;
-
+  Future<void> signIn({username: String, password: String}) async {
     try {
-      authResult = await _authInstance.signInWithEmailAndPassword(
-        email: emailID,
+      _authResult = await _authInstance.signInWithEmailAndPassword(
+        email: _getEmailFromUsername(username),
         password: password,
       );
-      if (authResult != null) {
-        print(authResult);
+      if (_authResult != null) {
+        print(_authResult);
         notifyListeners();
       }
     } catch (err) {
@@ -43,26 +28,47 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> signUp({emailID: String, password: String}) async {
+  Future<void> signUp({username: String, password: String}) async {
     AuthResult authResult;
 
     try {
       authResult = await _authInstance.createUserWithEmailAndPassword(
-        email: emailID,
+        email: _getEmailFromUsername(username),
         password: password,
       );
 
       if (authResult != null) {
-        notifyListeners();
+        try {
+          _storeUserInFirebase(userID: authResult.user.uid, username: username);
+          notifyListeners();
+        } catch (err) {
+          throw HTTPException(errorMessage: err.toString());
+        }
       }
     } catch (err) {
-
-      if(err.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
-        print("call singin");
-        await signIn(emailID: emailID,password: password);
-      } else{
-      throw HTTPException(errorMessage: err.toString());
+      if (err.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
+        await signIn(username: username, password: password);
+      } else {
+        throw HTTPException(errorMessage: err.toString());
       }
+    }
+  }
+
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> _storeUserInFirebase({String userID, String username}) async {
+    final firebaseRef = FirebaseDatabase.instance.reference();
+    try {
+      await firebaseRef.child(CONSTANT.firebaseNodeUser).child(userID).set(
+        {
+          'username': username,
+          'user_id': userID,
+        },
+      );
+    } catch (err) {
+      throw err;
     }
   }
 }

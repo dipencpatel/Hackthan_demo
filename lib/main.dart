@@ -1,5 +1,6 @@
 import 'package:demo/provider/auth_provider.dart';
 import 'package:demo/screens/command_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +18,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (cntx) => AuthProvider(),
+        ChangeNotifierProvider.value(
+          value: AuthProvider(),
         ),
       ],
       child: MaterialApp(
@@ -33,10 +34,26 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        initialRoute: '/',
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.onAuthStateChanged,
+          builder: (sbContext, snapshot) {
+            print('HAS DATA ${snapshot.hasData}');
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: Scaffold(
+                  body: Text('Loading...'),
+                ),
+              );
+            } else {
+              return CommandScreen(
+                isLoggedIn: snapshot.hasData,
+              );
+            }
+          },
+        ),
         debugShowCheckedModeBanner: false,
         routes: {
-          '/': (cntx) => CommandScreen(),
+          CommandScreen.routeName: (cntx) => CommandScreen(),
         },
       ),
     );
