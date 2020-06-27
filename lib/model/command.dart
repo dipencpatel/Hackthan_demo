@@ -13,11 +13,12 @@ enum eInputType {
   passwordTextField,
   infoText,
   authenticating,
+  commandTextField,
   text,
 }
 
 enum eCommandType {
   none,
   authenticationRequired,
-  shellCommand,
+  help,
 }
